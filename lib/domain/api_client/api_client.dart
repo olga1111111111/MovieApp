@@ -34,9 +34,7 @@ class ApiClient {
     );
     final request = await _client.getUrl(url);
     final response = await request.close();
-    final jsonStrings = await response.transform(utf8.decoder).toList();
-    final jsonString = jsonStrings.join();
-    final json = jsonDecode(jsonString) as Map<String, dynamic>;
+    final json = (await response.jsonDecode()) as Map<String, dynamic>;
     final token = json['request_token'] as String;
     return token;
   }
@@ -59,10 +57,7 @@ class ApiClient {
     request.headers.contentType = ContentType.json;
     request.write(jsonEncode(parametrs));
     final response = await request.close();
-
-    final jsonStrings = await response.transform(utf8.decoder).toList();
-    final jsonString = jsonStrings.join();
-    final json = jsonDecode(jsonString) as Map<String, dynamic>;
+    final json = (await response.jsonDecode()) as Map<String, dynamic>;
     final token = json['request_token'] as String;
     return token;
   }
@@ -81,10 +76,18 @@ class ApiClient {
     request.headers.contentType = ContentType.json;
     request.write(jsonEncode(parametrs));
     final response = await request.close();
-    final jsonStrings = await response.transform(utf8.decoder).toList();
-    final jsonString = jsonStrings.join();
-    final json = jsonDecode(jsonString) as Map<String, dynamic>;
+
+    final json = (await response.jsonDecode()) as Map<String, dynamic>;
     final sessionId = json['session_id'] as String;
     return sessionId;
+  }
+}
+
+extension HttpClientResponsJsonDecode on HttpClientResponse {
+  Future<dynamic> jsonDecode() async {
+    return transform(utf8.decoder)
+        .toList()
+        .then((value) => value.join())
+        .then((v) => json.decode(v));
   }
 }
