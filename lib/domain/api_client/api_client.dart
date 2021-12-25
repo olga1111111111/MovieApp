@@ -7,6 +7,17 @@ class ApiClient {
   static const _imageUrl = 'https://image.tmdb.org/t/p/w500';
   static const _apiKey = '744d0b824522a8e452d1272a1a9b2d76';
 
+  Future<String> auth({
+    required String username,
+    required String password,
+  }) async {
+    final token = await _makeToken();
+    final validToken = await _validateUser(
+        username: username, password: password, requestToken: token);
+    final sessionId = await _makeSession(requestToken: validToken);
+    return sessionId;
+  }
+
   Uri _makeUri(String path, [Map<String, dynamic>? parametrs]) {
     final uri = Uri.parse('$_host$path');
     if (parametrs != null) {
@@ -16,7 +27,7 @@ class ApiClient {
     }
   }
 
-  Future<String> makeToken() async {
+  Future<String> _makeToken() async {
     final url = _makeUri(
       '/authentication/token/new',
       {'api_key': _apiKey},
@@ -30,7 +41,7 @@ class ApiClient {
     return token;
   }
 
-  Future<String> validateUser({
+  Future<String> _validateUser({
     required String username,
     required String password,
     required String requestToken,
@@ -48,6 +59,7 @@ class ApiClient {
     request.headers.contentType = ContentType.json;
     request.write(jsonEncode(parametrs));
     final response = await request.close();
+
     final jsonStrings = await response.transform(utf8.decoder).toList();
     final jsonString = jsonStrings.join();
     final json = jsonDecode(jsonString) as Map<String, dynamic>;
@@ -55,7 +67,7 @@ class ApiClient {
     return token;
   }
 
-  Future<String> makeSession({
+  Future<String> _makeSession({
     required String requestToken,
   }) async {
     final url = _makeUri(
