@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:themoviedb/resources/resources.dart';
 import 'package:themoviedb/ui/widgets/elements/radial_persent_widget.dart';

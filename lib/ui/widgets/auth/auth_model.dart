@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:themoviedb/domain/api_client/api_client.dart';
+import 'package:themoviedb/ui/widgets/main_screen/main_screen_widget.dart';
 
 class AuthModel extends ChangeNotifier {
   final _apiClient = ApiClient();
@@ -10,6 +11,7 @@ class AuthModel extends ChangeNotifier {
 
   bool _isAuthProgress = false;
   bool get canStartAuth => !_isAuthProgress;
+  bool get isAuthProgress => _isAuthProgress;
 
   Future<void> auth(BuildContext context) async {
     final login = loginTextController.text;
@@ -23,12 +25,21 @@ class AuthModel extends ChangeNotifier {
     _errorMessage = null;
     _isAuthProgress = true;
     notifyListeners();
-    final sessionId = ApiClient().auth(
-      username: login,
-      password: password,
-    );
+    String? sessionId;
+    try {
+      sessionId = await ApiClient().auth(
+        username: login,
+        password: password,
+      );
+    } catch (e) {
+      _errorMessage = "неправильный логин или пароль!";
+    }
     _isAuthProgress = false;
-    notifyListeners();
+    if (_errorMessage == null || sessionId == null) {
+      notifyListeners();
+    }
+
+    // Navigator.of(context).pushNamed('/main_screen');
   }
 }
 

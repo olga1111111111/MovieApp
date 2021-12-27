@@ -157,6 +157,15 @@ class _AuthButtonWidget extends StatelessWidget {
     const color = Color.fromRGBO(1, 180, 228, 1);
     final onPressed = // чтобы кнопка была не активная после одного нажатия авторизации
         model?.canStartAuth == true ? () => model?.auth(context) : null;
+    final child = model?.isAuthProgress == true
+        ? SizedBox(
+            height: 20,
+            width: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+            ),
+          )
+        : Text('Войти');
     return ElevatedButton(
       style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(color),
@@ -169,7 +178,7 @@ class _AuthButtonWidget extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ))),
       onPressed: onPressed,
-      child: Text('Войти'),
+      child: child,
     );
   }
 }
