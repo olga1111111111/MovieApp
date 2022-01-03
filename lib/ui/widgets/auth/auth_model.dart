@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:themoviedb/domain/api_client/api_client.dart';
-import 'package:themoviedb/ui/widgets/main_screen/main_screen_widget.dart';
+
+import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
+import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
 class AuthModel extends ChangeNotifier {
   final _apiClient = ApiClient();
+  final _sessionDataProvider = SessionDataProvider();
   final loginTextController = TextEditingController();
   final passwordTextController = TextEditingController();
   String? _errorMessage;
@@ -35,11 +38,18 @@ class AuthModel extends ChangeNotifier {
       _errorMessage = "неправильный логин или пароль!";
     }
     _isAuthProgress = false;
-    if (_errorMessage == null || sessionId == null) {
+    if (_errorMessage != null) {
       notifyListeners();
+      return;
     }
-
-    // Navigator.of(context).pushNamed('/main_screen');
+    // сохранить перед навигацией sessionId:
+    if (sessionId == null) {
+      _errorMessage = "неизвестная ошибка, повторите попытку";
+      notifyListeners();
+      return;
+    }
+    await _sessionDataProvider.setSessionId(sessionId);
+    Navigator.of(context).pushNamed(MainNavigationRouteNames.mainScreen);
   }
 }
 
