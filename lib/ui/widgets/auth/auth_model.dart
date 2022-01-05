@@ -34,20 +34,32 @@ class AuthModel extends ChangeNotifier {
         username: login,
         password: password,
       );
-    } catch (e) {
-      _errorMessage = "неправильный логин или пароль!";
+    } on ApiClientException catch (e) {
+      switch (e.type) {
+        case ApiClientExceptionType.Network:
+          _errorMessage =
+              "Сервер недоступен. Проверьте подключение к интернету.";
+          break;
+        case ApiClientExceptionType.Auth:
+          _errorMessage = "Неправильный логин или пароль!";
+          break;
+        case ApiClientExceptionType.Other:
+          _errorMessage = "Произошла ошибка. Попробуйте еще раз!";
+          break;
+      }
     }
     _isAuthProgress = false;
     if (_errorMessage != null) {
       notifyListeners();
       return;
     }
-    // сохранить перед навигацией sessionId:
+
     if (sessionId == null) {
       _errorMessage = "неизвестная ошибка, повторите попытку";
       notifyListeners();
       return;
     }
+    // сохранить перед навигацией sessionId:
     await _sessionDataProvider.setSessionId(sessionId);
     Navigator.of(context)
         .pushReplacementNamed(MainNavigationRouteNames.mainScreen);
