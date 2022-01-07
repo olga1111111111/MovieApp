@@ -1,7 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 abstract class _Keys {
-  static const sessionId = 'ssesion-id';
+  static const sessionId = 'session-id';
 }
 
 class SessionDataProvider {
