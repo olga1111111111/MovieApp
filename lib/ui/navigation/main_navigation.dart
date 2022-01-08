@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:themoviedb/Labrary/Widgets/inherited/provider.dart';
 import 'package:themoviedb/ui/widgets/auth/auth_model.dart';
 import 'package:themoviedb/ui/widgets/auth/auth_widget.dart';
 import 'package:themoviedb/ui/widgets/main_screen/main_screen_widget.dart';
@@ -15,7 +16,7 @@ class MainNavigation {
       ? MainNavigationRouteNames.mainScreen
       : MainNavigationRouteNames.auth;
   final routs = <String, Widget Function(BuildContext)>{
-    MainNavigationRouteNames.auth: (context) => AuthProvaider(
+    MainNavigationRouteNames.auth: (context) => NotifierProvider(
           model: AuthModel(),
           child: const AuthWidget(),
         ),
