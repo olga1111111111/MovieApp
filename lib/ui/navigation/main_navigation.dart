@@ -15,7 +15,7 @@ class MainNavigation {
   String initialRoute(bool isAuth) => isAuth
       ? MainNavigationRouteNames.mainScreen
       : MainNavigationRouteNames.auth;
-  final routs = <String, Widget Function(BuildContext)>{
+  final routes = <String, Widget Function(BuildContext)>{
     MainNavigationRouteNames.auth: (context) => NotifierProvider(
           model: AuthModel(),
           child: const AuthWidget(),
