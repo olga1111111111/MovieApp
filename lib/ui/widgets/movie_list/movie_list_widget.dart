@@ -1,122 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/resources/resources.dart';
-import 'package:themoviedb/ui/navigation/main_navigation.dart';
+import 'package:themoviedb/Labrary/Widgets/inherited/provider.dart';
 
-class Movie {
-  final int id;
-  final String imageName;
-  final String title;
-  final String time;
-  final String description;
+import 'package:themoviedb/ui/widgets/movie_list/movie_list_model.dart';
 
-  Movie({
-    required this.id,
-    required this.imageName,
-    required this.title,
-    required this.time,
-    required this.description,
-  });
-}
-
-class MovieListWidget extends StatefulWidget {
-  MovieListWidget({Key? key}) : super(key: key);
-
-  @override
-  _MovieListWidgetState createState() => _MovieListWidgetState();
-}
-
-class _MovieListWidgetState extends State<MovieListWidget> {
-  final _movie = [
-    Movie(
-        id: 1,
-        imageName: AppImages.hero,
-        title: 'Герой',
-        time: '21 agust 2021',
-        description:
-            'lkjlkljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj'),
-    Movie(
-        id: 2,
-        imageName: AppImages.hero,
-        title: 'Прибытие',
-        time: '21 agust 2021',
-        description:
-            'lkjlkljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj'),
-    Movie(
-        id: 3,
-        imageName: AppImages.hero,
-        title: 'Назад в будущее 1',
-        time: '21 agust 2021',
-        description:
-            'lkjlkljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj'),
-    Movie(
-        id: 4,
-        imageName: AppImages.hero,
-        title: 'Назад в будущее 2',
-        time: '21 agust 2021',
-        description:
-            'lkjlkljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj'),
-    Movie(
-        id: 5,
-        imageName: AppImages.hero,
-        title: 'Дом',
-        time: '21 agust 2021',
-        description:
-            'lkjlkljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj'),
-    Movie(
-        id: 6,
-        imageName: AppImages.hero,
-        title: 'Джентельмены',
-        time: '21 agust 2021',
-        description:
-            'lkjlkljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj'),
-    Movie(
-        id: 7,
-        imageName: AppImages.hero,
-        title: 'В бой идут одни старики',
-        time: '21 agust 2021',
-        description:
-            'lkjlkljjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj'),
-  ];
-
-  final _searchController = TextEditingController();
-  var _filteredMovies = <Movie>[];
-  void _searchMovies() {
-    final query = _searchController.text;
-    if (query.isNotEmpty) {
-      _filteredMovies = _movie.where((Movie movie) {
-        return movie.title.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    } else {
-      _filteredMovies = _movie;
-    }
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _filteredMovies = _movie;
-    _searchController.addListener(_searchMovies);
-  }
-
-  void _onMovieTap(int index) {
-    final id = _movie[index].id;
-    Navigator.of(context)
-        .pushNamed(MainNavigationRouteNames.movieDetails, arguments: id);
-  }
+class MovieListWidget extends StatelessWidget {
+  const MovieListWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final model = NotifierProvider.watch<MovieListModel>(context);
+    if (model == null) return const SizedBox.shrink();
     return Scaffold(
       body: Stack(
         children: [
           ListView.builder(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: EdgeInsets.only(top: 70),
-              itemCount: _filteredMovies.length,
+              itemCount: model.movies.length,
               itemExtent: 163,
               itemBuilder: (BuildContext context, int index) {
-                final movie = _filteredMovies[index];
+                final movie = model.movies[index];
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -139,7 +42,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                         clipBehavior: Clip.hardEdge,
                         child: Row(
                           children: [
-                            Image(image: AssetImage(movie.imageName)),
+                            // Image(image: AssetImage(movie.imageName)),
                             SizedBox(
                               width: 15,
                             ),
@@ -157,14 +60,15 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                                     ),
                                     SizedBox(height: 5),
                                     Text(
-                                      movie.time,
+                                      movie.releaseDate?.toString() ??
+                                          "56958769857",
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(color: Colors.grey),
                                     ),
                                     SizedBox(height: 5),
                                     Text(
-                                      movie.description,
+                                      movie.overview,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -180,7 +84,7 @@ class _MovieListWidgetState extends State<MovieListWidget> {
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(10),
-                          onTap: () => _onMovieTap(index),
+                          onTap: () => model.onMovieTab(context, index),
                         ),
                       )
                     ],
@@ -190,7 +94,6 @@ class _MovieListWidgetState extends State<MovieListWidget> {
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: TextField(
-              controller: _searchController,
               decoration: InputDecoration(
                 labelText: 'Поиск',
                 filled: true,

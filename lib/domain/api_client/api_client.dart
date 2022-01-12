@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:themoviedb/domain/entity/popular_movie_response.dart';
+
 /// ошибки
 /// 1) нет сети
 /// 2) нет ответа от сервера, таймаут соединения
@@ -82,12 +84,11 @@ class ApiClient {
     return result;
   }
 
-  Future<dynamic> popularMovie(int page, String locale) async {
+  Future<PopularMovieResponse> popularMovie(int page, String locale) async {
     final parser = (dynamic json) {
-      // final jsonMap = json as Map<String, dynamic>;
-      // final token = jsonMap['request_token'] as String;
-      // return token;
-      return json;
+      final jsonMap = json as Map<String, dynamic>;
+      final response = PopularMovieResponse.fromJson(jsonMap);
+      return response;
     };
     final result = _get(
       '/movie/popular',
