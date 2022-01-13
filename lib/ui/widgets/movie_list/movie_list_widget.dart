@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:themoviedb/Labrary/Widgets/inherited/provider.dart';
+import 'package:themoviedb/domain/api_client/api_client.dart';
 
 import 'package:themoviedb/ui/widgets/movie_list/movie_list_model.dart';
 
@@ -20,6 +22,8 @@ class MovieListWidget extends StatelessWidget {
               itemExtent: 163,
               itemBuilder: (BuildContext context, int index) {
                 final movie = model.movies[index];
+                final posterPath = movie.posterPath;
+
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -43,6 +47,12 @@ class MovieListWidget extends StatelessWidget {
                         child: Row(
                           children: [
                             // Image(image: AssetImage(movie.imageName)),
+                            posterPath != null
+                                ? Image.network(
+                                    ApiClient.imageUrl(posterPath),
+                                    width: 95,
+                                  )
+                                : SizedBox.shrink(),
                             SizedBox(
                               width: 15,
                             ),
@@ -60,8 +70,7 @@ class MovieListWidget extends StatelessWidget {
                                     ),
                                     SizedBox(height: 5),
                                     Text(
-                                      movie.releaseDate?.toString() ??
-                                          "56958769857",
+                                      model.stringFromDate(movie.releaseDate),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(color: Colors.grey),
