@@ -9,13 +9,24 @@ class MovieListModel extends ChangeNotifier {
   final _apiClient = ApiClient();
   final _movies = <Movie>[];
   List<Movie> get movies => List.unmodifiable(_movies);
-  final _dateFormat = DateFormat.yMMMd();
+  late DateFormat _dateFormat;
+  String _locale = '';
 
   String stringFromDate(DateTime? date) =>
       date != null ? _dateFormat.format(date) : "";
 
-  Future<void> loadMovies() async {
-    final movieResponse = await _apiClient.popularMovie(1, 'ru-RU');
+  void setupLocale(BuildContext context) {
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    if (_locale == locale) return;
+    _locale = locale;
+    _dateFormat = DateFormat.yMMMd(locale);
+    _movies.clear();
+    _loadMovies();
+    print(locale);
+  }
+
+  Future<void> _loadMovies() async {
+    final movieResponse = await _apiClient.popularMovie(1, _locale);
     _movies.addAll(movieResponse.movie);
     notifyListeners();
   }
