@@ -50,7 +50,8 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
           ),
           // Text("reerr"),
           NotifierProvider(
-            model: movieListModel,
+            create: () => movieListModel,
+            isManagingModel: false,
             child: const MovieListWidget(),
           ),
           Text(
