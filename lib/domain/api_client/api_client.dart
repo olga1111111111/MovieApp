@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:themoviedb/domain/entity/movie_details.dart';
 import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 
 /// ошибки
@@ -82,6 +83,26 @@ class ApiClient {
       '/authentication/token/new',
       parser,
       {'api_key': _apiKey},
+    );
+    return result;
+  }
+
+  Future<MovieDetails> movieDetails(
+    String locale,
+    int movieId,
+  ) async {
+    final parser = (dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = MovieDetails.fromJson(jsonMap);
+      return response;
+    };
+    final result = _get(
+      '/movie/$movieId',
+      parser,
+      {
+        'api_key': _apiKey,
+        'language': locale,
+      },
     );
     return result;
   }
