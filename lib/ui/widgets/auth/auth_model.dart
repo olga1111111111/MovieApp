@@ -29,11 +29,13 @@ class AuthModel extends ChangeNotifier {
     _isAuthProgress = true;
     notifyListeners();
     String? sessionId;
+    int? accountId;
     try {
-      sessionId = await ApiClient().auth(
+      sessionId = await _apiClient.auth(
         username: login,
         password: password,
       );
+      accountId = await _apiClient.getAccountInfo(sessionId);
     } on ApiClientException catch (e) {
       switch (e.type) {
         case ApiClientExceptionType.Network:
@@ -46,6 +48,8 @@ class AuthModel extends ChangeNotifier {
         case ApiClientExceptionType.Other:
           _errorMessage = "Произошла ошибка. Попробуйте еще раз!";
           break;
+        default:
+          print(e);
       }
     }
     _isAuthProgress = false;
@@ -54,13 +58,14 @@ class AuthModel extends ChangeNotifier {
       return;
     }
 
-    if (sessionId == null) {
+    if (sessionId == null || accountId == null) {
       _errorMessage = "неизвестная ошибка, повторите попытку";
       notifyListeners();
       return;
     }
     // сохранить перед навигацией sessionId:
     await _sessionDataProvider.setSessionId(sessionId);
+    await _sessionDataProvider.setAccountId(accountId);
     Navigator.of(context)
         .pushReplacementNamed(MainNavigationRouteNames.mainScreen);
   }

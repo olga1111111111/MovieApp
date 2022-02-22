@@ -1,19 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:themoviedb/domain/api_client/api_client.dart';
+import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
 import 'package:themoviedb/domain/entity/movie_details.dart';
 
 class MovieDetailsModel extends ChangeNotifier {
+  final _sessionDataProvider = SessionDataProvider();
   final _apiClient = ApiClient();
 
   final int movieId;
   MovieDetails? _movieDetails;
   String _locale = "";
-  late final DateFormat _dateFormat;
+  bool _isFavorite = false;
+  late DateFormat _dateFormat;
+  Future<void>? Function()? onSessionExpired;
 
   MovieDetailsModel(this.movieId);
 
   MovieDetails? get movieDetails => _movieDetails;
+  bool get isFavorite => _isFavorite;
 
   String stringFromDate(DateTime? date) =>
       date != null ? _dateFormat.format(date) : "";
@@ -27,7 +32,47 @@ class MovieDetailsModel extends ChangeNotifier {
   }
 
   Future<void> loadDetails() async {
-    _movieDetails = await _apiClient.movieDetails(_locale, movieId);
+    try {
+      _movieDetails = await _apiClient.movieDetails(_locale, movieId);
+      final sessionId = await _sessionDataProvider.getSessionId();
+      if (sessionId != null) {
+        _isFavorite = await _apiClient.isFavorite(sessionId, movieId);
+      }
+
+      notifyListeners();
+    } on ApiClientException catch (e) {
+      _handleApiClientExeption(e);
+    }
+  }
+
+  Future<void> toggleFavorite() async {
+    final sessionId = await _sessionDataProvider.getSessionId();
+    final accountId = await _sessionDataProvider.getAccountId();
+
+    if (sessionId == null || accountId == null) return;
+
+    _isFavorite = !_isFavorite;
     notifyListeners();
+    try {
+      await _apiClient.markAsFavorite(
+        accountId: accountId,
+        sessionId: sessionId,
+        mediaType: MediaType.Movie,
+        mediaId: movieId,
+        isFavorite: _isFavorite,
+      );
+    } on ApiClientException catch (e) {
+      _handleApiClientExeption(e);
+    }
+  }
+
+  void _handleApiClientExeption(ApiClientException exception) {
+    switch (exception.type) {
+      case ApiClientExceptionType.SessionExpired:
+        onSessionExpired?.call();
+        break;
+      default:
+        print(exception);
+    }
   }
 }
