@@ -62,7 +62,9 @@ class MovieDetailsModel extends ChangeNotifier {
         isFavorite: _isFavorite,
       );
     } on ApiClientException catch (e) {
-      _handleApiClientExeption(e);
+      print(e);
+      // выбивает из приложения при status code 3:
+      // _handleApiClientExeption(e);
     }
   }
 

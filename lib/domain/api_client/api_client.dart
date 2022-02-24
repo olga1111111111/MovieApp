@@ -213,7 +213,6 @@ class ApiClient {
       request.headers.contentType = ContentType.json;
       request.write(jsonEncode(bodyParametrs));
       final response = await request.close();
-
       final dynamic json = (await response.jsonDecode());
       _validateResponse(response, json);
 
@@ -239,7 +238,7 @@ class ApiClient {
       return 1;
     };
     final parametrs = <String, dynamic>{
-      'media_type': mediaType.asString(),
+      'media_type': mediaType,
       'media_id': mediaId,
       'favorite': isFavorite,
     };

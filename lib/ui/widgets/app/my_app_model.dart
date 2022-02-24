@@ -15,7 +15,7 @@ class MyAppModel {
   Future<void> resetSession(BuildContext context) async {
     await _sessionDataProvider.setSessionId(null);
     await _sessionDataProvider.setAccountId(null);
-    // из любого экрана вернет на экран навигации
+    // из любого экрана вернет на экран авторизации
     await Navigator.of(context).pushNamedAndRemoveUntil(
         MainNavigationRouteNames.auth, (route) => false);
   }
