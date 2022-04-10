@@ -39,13 +39,13 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
             onPressed: () => SessionDataProvider().setSessionId(null),
           )
         ],
-        title: Text('TMDB'),
+        title: const Text('TMDB'),
       ),
       body: IndexedStack(
         // child: _widgetOptions.elementAt(_selectedTab),
         index: _selectedTab,
         children: [
-          Text(
+          const Text(
             'новости',
           ),
           // Text("reerr"),
@@ -54,14 +54,14 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
             isManagingModel: false,
             child: const MovieListWidget(),
           ),
-          Text(
+          const Text(
             'сериалы',
           ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedTab,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.note), label: 'новости'),
           BottomNavigationBarItem(
               icon: Icon(Icons.movie_creation_outlined), label: 'фильмы'),

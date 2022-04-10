@@ -23,6 +23,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  provider: ^6.0.2 
+  flutter_lints: ^1.0.4
   json_annotation: ^4.1.0
   flutter_secure_storage: ^5.0.2 
   flutter_localizations:

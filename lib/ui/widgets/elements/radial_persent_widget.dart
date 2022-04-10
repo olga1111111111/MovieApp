@@ -18,7 +18,7 @@ class _RadialWidgetState extends State<RadialWidget> {
           height: 100,
           width: 100,
           // decoration: BoxDecoration(border: Border.all(color: Colors.red)),
-          child: RadialPersentWidget(
+          child: const RadialPersentWidget(
             lineWidth: 5,
             lineColor: Colors.red,
             fillColor: Colors.blue,
@@ -145,7 +145,7 @@ class MyPainter extends CustomPainter {
   }
 
   Rect calculateArcRect(Size size) {
-    final lineMargin = 3;
+    const lineMargin = 3;
     final offset = lineWidth / 2 + lineMargin;
     final arcRect = Offset(offset, offset) &
         Size(size.width - offset * 2, size.height - offset * 2);

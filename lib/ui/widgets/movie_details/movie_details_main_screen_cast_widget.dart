@@ -14,8 +14,8 @@ class MovieDetailsMainScreenCastWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
+          const Padding(
+            padding: EdgeInsets.all(10.0),
             child: Text(
               "Series cast",
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
@@ -29,8 +29,8 @@ class MovieDetailsMainScreenCastWidget extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.all(3.0),
-            child:
-                TextButton(onPressed: () {}, child: Text("Full cast & Crew")),
+            child: TextButton(
+                onPressed: () {}, child: const Text("Full cast & Crew")),
           ),
         ],
       ),
@@ -77,17 +77,17 @@ class _ActorListItemWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Colors.black.withOpacity(0.2)),
-            borderRadius: BorderRadius.all(Radius.circular(15)),
+            borderRadius: const BorderRadius.all(Radius.circular(15)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
                 blurRadius: 8,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               )
             ],
           ),
           child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
             clipBehavior: Clip.hardEdge,
             child: Column(
               children: [
@@ -109,7 +109,7 @@ class _ActorListItemWidget extends StatelessWidget {
                           actor.name,
                           maxLines: 1,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 7,
                         ),
                         Text(
