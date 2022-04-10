@@ -15,26 +15,26 @@ class MovieDetailsMainInfoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      children: const [
         _TopPosterWidget(),
         Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(20.0),
           child: _MovieNamedWidget(),
         ),
         _ScoreWidget(),
         _SummaryWidget(),
         Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(10.0),
           child: _OverviewWidget(),
         ),
         Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(10.0),
           child: _DescriptionWidget(),
         ),
         SizedBox(
           height: 20,
         ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: 10),
           child: _PeopleWidget(),
         ),
@@ -120,9 +120,9 @@ class _PeopleWidgetRowItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final namedStyle = TextStyle(
+    const namedStyle = TextStyle(
         fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400);
-    final castMovieStyle = TextStyle(
+    const castMovieStyle = TextStyle(
         fontSize: 16, color: Colors.white, fontWeight: FontWeight.w400);
     return Expanded(
       child: Column(
@@ -153,7 +153,7 @@ class _DescriptionWidget extends StatelessWidget {
 
     return Text(
       model?.movieDetails?.overview ?? '',
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 16,
         color: Colors.white,
         fontWeight: FontWeight.w400,
@@ -169,7 +169,7 @@ class _OverviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return const Text(
       'Overview',
       style: TextStyle(
         fontSize: 16,
@@ -239,7 +239,7 @@ class _MovieNamedWidget extends StatelessWidget {
                   const TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
           TextSpan(
               text: year,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: Colors.grey))
@@ -269,14 +269,14 @@ class _ScoreWidget extends StatelessWidget {
             width: 50,
             height: 50,
             child: RadialPersentWidget(
-              fillColor: Color.fromARGB(255, 10, 23, 25),
-              freeColor: Color.fromARGB(255, 25, 54, 31),
-              lineColor: Color.fromARGB(255, 37, 203, 103),
+              fillColor: const Color.fromARGB(255, 10, 23, 25),
+              freeColor: const Color.fromARGB(255, 25, 54, 31),
+              lineColor: const Color.fromARGB(255, 37, 203, 103),
               percent: voteAverage / 100,
               lineWidth: 3,
               child: Text(
                 voteAverage.toStringAsFixed(0),
-                style: TextStyle(color: Colors.white, fontSize: 15),
+                style: const TextStyle(color: Colors.white, fontSize: 15),
               ),
             ),
           ),
@@ -294,12 +294,12 @@ class _ScoreWidget extends StatelessWidget {
                   MainNavigationRouteNames.movieTrailerWidget,
                   arguments: trailerKey),
               child: Row(
-                children: [
-                  const Icon(
+                children: const [
+                  Icon(
                     Icons.play_arrow,
                     // color: Colors.grey,
                   ),
-                  const Text('Play Trailer'),
+                  Text('Play Trailer'),
                 ],
               ),
             )

@@ -57,12 +57,11 @@ class MovieDetailsModel extends ChangeNotifier {
       await _apiClient.markAsFavorite(
         accountId: accountId,
         sessionId: sessionId,
-        mediaType: MediaType.Movie,
+        mediaType: MediaType.movie,
         mediaId: movieId,
         isFavorite: _isFavorite,
       );
-    } on ApiClientException catch (e) {
-      print(e);
+    } on ApiClientException catch (_) {
       // выбивает из приложения при status code 3:
       // _handleApiClientExeption(e);
     }
@@ -70,7 +69,7 @@ class MovieDetailsModel extends ChangeNotifier {
 
   void _handleApiClientExeption(ApiClientException exception) {
     switch (exception.type) {
-      case ApiClientExceptionType.SessionExpired:
+      case ApiClientExceptionType.sessionExpired:
         onSessionExpired?.call();
         break;
       default:

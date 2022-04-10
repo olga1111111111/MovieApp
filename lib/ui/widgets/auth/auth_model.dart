@@ -38,14 +38,14 @@ class AuthModel extends ChangeNotifier {
       accountId = await _apiClient.getAccountInfo(sessionId);
     } on ApiClientException catch (e) {
       switch (e.type) {
-        case ApiClientExceptionType.Network:
+        case ApiClientExceptionType.network:
           _errorMessage =
               "Сервер недоступен. Проверьте подключение к интернету.";
           break;
-        case ApiClientExceptionType.Auth:
+        case ApiClientExceptionType.auth:
           _errorMessage = "Неправильный логин или пароль!";
           break;
-        case ApiClientExceptionType.Other:
+        case ApiClientExceptionType.other:
           _errorMessage = "Произошла ошибка. Попробуйте еще раз!";
           break;
         default:

@@ -12,7 +12,7 @@ import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 /// 5) сервер ответил не то,что ожидали
 /// 6) сервер ответил ожидаемой ошибкой /
 
-enum ApiClientExceptionType { Network, Auth, Other, SessionExpired }
+enum ApiClientExceptionType { network, auth, other, sessionExpired }
 
 class ApiClientException implements Exception {
   final ApiClientExceptionType type;
@@ -20,14 +20,14 @@ class ApiClientException implements Exception {
   ApiClientException(this.type);
 }
 
-enum MediaType { Movie, TV }
+enum MediaType { movie, tv }
 
 extension MediaTypeAsString on MediaType {
   String asString() {
     switch (this) {
-      case MediaType.Movie:
+      case MediaType.movie:
         return 'movie';
-      case MediaType.TV:
+      case MediaType.tv:
         return 'tv';
     }
   }
@@ -78,11 +78,11 @@ class ApiClient {
       final result = parser(json);
       return result;
     } on SocketException {
-      throw ApiClientException(ApiClientExceptionType.Network);
+      throw ApiClientException(ApiClientExceptionType.network);
     } on ApiClientException {
       rethrow;
     } catch (_) {
-      throw ApiClientException(ApiClientExceptionType.Other);
+      throw ApiClientException(ApiClientExceptionType.other);
     }
   }
 
@@ -219,11 +219,11 @@ class ApiClient {
       final result = parser(json);
       return result;
     } on SocketException {
-      throw ApiClientException(ApiClientExceptionType.Network);
+      throw ApiClientException(ApiClientExceptionType.network);
     } on ApiClientException {
       rethrow;
     } catch (e) {
-      throw ApiClientException(ApiClientExceptionType.Other);
+      throw ApiClientException(ApiClientExceptionType.other);
     }
   }
 
@@ -238,7 +238,7 @@ class ApiClient {
       return 1;
     };
     final parametrs = <String, dynamic>{
-      'media_type': mediaType,
+      'media_type': mediaType.asString(),
       'media_id': mediaId,
       'favorite': isFavorite,
     };
@@ -303,11 +303,11 @@ class ApiClient {
       final status = json["status_code"];
       final code = status is int ? status : 0;
       if (code == 30) {
-        throw ApiClientException(ApiClientExceptionType.Auth);
+        throw ApiClientException(ApiClientExceptionType.auth);
       } else if (code == 3) {
-        throw ApiClientException(ApiClientExceptionType.SessionExpired);
+        throw ApiClientException(ApiClientExceptionType.sessionExpired);
       } else {
-        throw ApiClientException(ApiClientExceptionType.Other);
+        throw ApiClientException(ApiClientExceptionType.other);
       }
     }
   }

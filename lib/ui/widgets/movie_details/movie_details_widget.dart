@@ -63,7 +63,7 @@ class _BodyWidget extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
     return ListView(
-      children: [
+      children: const [
         MovieDetailsMainInfoWidget(),
         SizedBox(height: 30),
         MovieDetailsMainScreenCastWidget(),
