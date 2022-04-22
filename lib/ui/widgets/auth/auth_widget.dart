@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/Labrary/Widgets/inherited/provider.dart';
+import 'package:provider/provider.dart';
+
 import 'package:themoviedb/ui/theme/app_button_style.dart';
 import 'package:themoviedb/ui/widgets/auth/auth_model.dart';
 
-class AuthWidget extends StatefulWidget {
+class AuthWidget extends StatelessWidget {
   const AuthWidget({Key? key}) : super(key: key);
 
-  @override
-  _AuthWidgetState createState() => _AuthWidgetState();
-}
-
-class _AuthWidgetState extends State<AuthWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +79,7 @@ class _FormWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.read<AuthModel>(context);
+    final model = context.read<AuthViewModel>();
     const textStyle = TextStyle(
       color: Color(0xFF212529),
       fontSize: 16,
@@ -106,7 +102,7 @@ class _FormWidget extends StatelessWidget {
           height: 5,
         ),
         TextField(
-          controller: model?.loginTextController,
+          controller: model.loginTextController,
           decoration: textFildDecorator,
         ),
         const SizedBox(
@@ -120,7 +116,7 @@ class _FormWidget extends StatelessWidget {
           height: 5,
         ),
         TextField(
-          controller: model?.passwordTextController,
+          controller: model.passwordTextController,
           decoration: textFildDecorator,
           obscureText: true,
         ),
@@ -154,11 +150,11 @@ class _AuthButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<AuthModel>(context);
+    final model = context.watch<AuthViewModel>();
     const color = Color.fromRGBO(1, 180, 228, 1);
     final onPressed = // чтобы кнопка была не активная после одного нажатия авторизации
-        model?.canStartAuth == true ? () => model?.auth(context) : null;
-    final child = model?.isAuthProgress == true
+        model.canStartAuth ? () => model.auth(context) : null;
+    final child = model.isAuthProgress
         ? const SizedBox(
             height: 20,
             width: 20,
@@ -189,8 +185,8 @@ class _ErrorMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final errorMassage =
-        NotifierProvider.watch<AuthModel>(context)?.errorMessage;
+    final errorMassage = context.select((AuthViewModel m) => m.errorMessage);
+
     // shrink схлопнется и пустое место покажет
     if (errorMassage == null) return const SizedBox.shrink();
     return Padding(

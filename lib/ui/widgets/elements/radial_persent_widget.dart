@@ -11,14 +11,14 @@ class RadialWidget extends StatefulWidget {
 class _RadialWidgetState extends State<RadialWidget> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Container(
+        child: SizedBox(
           height: 100,
           width: 100,
           // decoration: BoxDecoration(border: Border.all(color: Colors.red)),
-          child: const RadialPersentWidget(
+          child: RadialPersentWidget(
             lineWidth: 5,
             lineColor: Colors.red,
             fillColor: Colors.blue,

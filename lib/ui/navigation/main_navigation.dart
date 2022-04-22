@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import '../../domain/factories/screen_factory.dart';
 
@@ -37,5 +39,10 @@ class MainNavigation {
         const widget = Text('Navigation error');
         return MaterialPageRoute(builder: (_) => widget);
     }
+  }
+
+  static void resetNavigation(BuildContext context) {
+    Navigator.of(context).pushNamedAndRemoveUntil(
+        MainNavigationRouteNames.loaderWidget, (route) => false);
   }
 }
