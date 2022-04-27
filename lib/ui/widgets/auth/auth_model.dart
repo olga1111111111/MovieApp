@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/domain/api_client/api_client.dart';
 
 import 'package:themoviedb/domain/services/auth_service.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
+
+import '../../../domain/api_client/api_client_exception.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final _authService = AuthService();
@@ -17,49 +18,62 @@ class AuthViewModel extends ChangeNotifier {
   bool get canStartAuth => !_isAuthProgress;
   bool get isAuthProgress => _isAuthProgress;
 
-  Future<void> auth(BuildContext context) async {
-    final login = loginTextController.text;
-    final password = passwordTextController.text;
+  bool _isValid(String login, String password) =>
+      login.isNotEmpty || password.isNotEmpty;
 
-    if (login.isEmpty || password.isEmpty) {
-      _errorMessage = "заполните логин и пароль";
-      notifyListeners();
-      return;
-    }
-    _errorMessage = null;
-    _isAuthProgress = true;
-    notifyListeners();
-
+  Future<String?> _login(String login, String password) async {
     try {
       await _authService.login(login, password);
     } on ApiClientException catch (e) {
       switch (e.type) {
         case ApiClientExceptionType.network:
-          _errorMessage =
-              "Сервер недоступен. Проверьте подключение к интернету.";
-          break;
+          // _errorMessage =
+          return "Сервер недоступен. Проверьте подключение к интернету.";
+        // break;
         case ApiClientExceptionType.auth:
-          _errorMessage = "Неправильный логин или пароль!";
-          break;
+          return "Неправильный логин или пароль!";
+
         case ApiClientExceptionType.other:
-          _errorMessage = "Произошла ошибка. Попробуйте еще раз!";
-          break;
+          return "Произошла ошибка. Попробуйте еще раз!";
 
         case ApiClientExceptionType.sessionExpired:
       }
     } catch (e) {
-      _errorMessage = "неизвестная ошибка, повторите попытку";
+      return "неизвестная ошибка, повторите попытку";
     }
-    _isAuthProgress = false;
-    if (_errorMessage != null) {
-      notifyListeners();
+    return null;
+  }
+
+  Future<void> auth(BuildContext context) async {
+    final login = loginTextController.text;
+    final password = passwordTextController.text;
+
+    if (!_isValid(login, password)) {
+      _updateState("заполните логин и пароль", false);
+
       return;
+    }
+    _updateState(null, true);
+
+    _errorMessage = await _login(login, password);
+    if (_errorMessage == null) {
+      MainNavigation.resetNavigation(context);
+    } else {
+      _updateState(_errorMessage, false);
     }
 
     // сохранить перед навигацией sessionId:
     // await _sessionDataProvider.setSessionId(sessionId);
     // await _sessionDataProvider.setAccountId(accountId);
-    MainNavigation.resetNavigation(context);
+  }
+
+  void _updateState(String? errorMessage, bool isAuthProgress) {
+    if (_errorMessage == errorMessage && _isAuthProgress == isAuthProgress) {
+      return;
+    }
+    _errorMessage = errorMessage;
+    _isAuthProgress = isAuthProgress;
+    notifyListeners();
   }
 }
 
