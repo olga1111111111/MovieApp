@@ -8,18 +8,34 @@ import 'package:themoviedb/domain/entity/popular_movie_response.dart';
 
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
-class MovieListModel extends ChangeNotifier {
+class MovieListRowData {
+  final int id;
+  final String title;
+  final String overview;
+  final String releaseDate;
+  final String? posterPath;
+
+  MovieListRowData(
+      {required this.id,
+      required this.title,
+      required this.overview,
+      required this.releaseDate,
+      required this.posterPath});
+}
+
+class MovieListViewModel extends ChangeNotifier {
   final _apiClient = MovieApiClient();
-  final _movies = <Movie>[];
-  List<Movie> get movies => List.unmodifiable(_movies);
+  Timer? searchDebounce;
+  String _locale = '';
+  final _movies = <MovieListRowData>[];
+  List<MovieListRowData> get movies => List.unmodifiable(_movies);
   late int _totalPage;
   var _isLoadingInProgress = false;
   late int _currentPage;
   String? _searchQuery;
   late DateFormat _dateFormat;
-  String _locale = '';
+
 // запрос с задержкой таймера для отмены побуквенного запроса:
-  Timer? searchDebounce;
 
   String stringFromDate(DateTime? date) =>
       date != null ? _dateFormat.format(date) : "";
@@ -58,7 +74,7 @@ class MovieListModel extends ChangeNotifier {
     final nextPage = _currentPage + 1;
     try {
       final movieResponse = await _loadMovies(nextPage, _locale);
-      _movies.addAll(movieResponse.movie);
+      _movies.addAll(movieResponse.movies.map(_makeRowData).toList());
       _currentPage = movieResponse.page;
       _totalPage = movieResponse.totalPages;
       _isLoadingInProgress = false;
@@ -66,6 +82,19 @@ class MovieListModel extends ChangeNotifier {
     } catch (e) {
       _isLoadingInProgress = false;
     }
+  }
+
+  MovieListRowData _makeRowData(Movie movie) {
+    final releaseDate = movie.releaseDate;
+    final releaseDateTitle =
+        releaseDate != null ? _dateFormat.format(releaseDate) : '';
+    return MovieListRowData(
+      id: movie.id,
+      title: movie.title,
+      overview: movie.overview,
+      releaseDate: releaseDateTitle,
+      posterPath: movie.posterPath,
+    );
   }
 
   void onMovieTab(BuildContext context, int index) {

@@ -21,7 +21,7 @@ Map<String, dynamic> _$PopularMovieResponseToJson(
         PopularMovieResponse instance) =>
     <String, dynamic>{
       'page': instance.page,
-      'results': instance.movie.map((e) => e.toJson()).toList(),
+      'results': instance.movies.map((e) => e.toJson()).toList(),
       'total_results': instance.totalResults,
       'total_pages': instance.totalPages,
     };
