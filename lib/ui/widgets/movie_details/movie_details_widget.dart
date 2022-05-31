@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:themoviedb/Labrary/Widgets/inherited/provider.dart';
-import 'package:themoviedb/ui/widgets/app/my_app_model.dart';
+import 'package:provider/provider.dart';
+// import 'package:themoviedb/Labrary/Widgets/inherited/provider.dart';
+
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_main_info.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_main_screen_cast_widget.dart';
 import 'package:themoviedb/ui/widgets/movie_details/movie_details_model.dart';
@@ -14,17 +15,9 @@ class MovieDetailsWidget extends StatefulWidget {
 
 class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
   @override
-  void initState() {
-    super.initState();
-    final model = NotifierProvider.read<MovieDetailsModel>(context);
-    final appModel = Provider.read<MyAppModel>(context);
-    model?.onSessionExpired = () => appModel?.resetSession(context);
-  }
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    NotifierProvider.read<MovieDetailsModel>(context)?.setupLocale(context);
+    context.read<MovieDetailsModel>().setupLocale(context);
   }
 
   @override
@@ -47,8 +40,9 @@ class _TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    return Text(model?.movieDetails?.title ?? 'Загрузка...');
+    final title =
+        context.select((MovieDetailsModel model) => model.movieDetails?.title);
+    return Text(title ?? 'Загрузка...');
   }
 }
 
@@ -57,8 +51,9 @@ class _BodyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    final movieDetails = model?.movieDetails;
+    final movieDetails =
+        context.select((MovieDetailsModel model) => model.movieDetails);
+
     if (movieDetails == null) {
       return const Center(child: CircularProgressIndicator());
     }

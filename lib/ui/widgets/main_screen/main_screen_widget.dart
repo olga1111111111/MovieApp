@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
 import 'package:themoviedb/domain/factories/screen_factory.dart';
 import 'package:themoviedb/ui/widgets/movie_list/movie_list_model.dart';
 
@@ -35,10 +34,10 @@ class _MainScreenWidgetState extends State<MainScreenWidget> {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            // временный логаут:
-            onPressed: () => SessionDataProvider().setSessionId(null),
-          )
+              icon: const Icon(Icons.search),
+              // временный логаут:
+              onPressed: () {} // => SessionDataProvider().deleteSessionId(),
+              )
         ],
         title: const Text('TMDB'),
       ),
