@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'package:themoviedb/Labrary/Widgets/inherited/provider.dart';
+import 'package:provider/provider.dart';
 
 import 'package:themoviedb/domain/api_client/image_downloader.dart';
 import 'package:themoviedb/domain/entity/movie_details_credits.dart';
@@ -49,8 +48,8 @@ class _PeopleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    var crew = model?.movieDetails?.credits.crew;
+    var crew = context
+        .select((MovieDetailsModel model) => model.movieDetails?.credits.crew);
     if (crew == null || crew.isEmpty) return const SizedBox.shrink();
     crew = crew.length > 4 ? crew.sublist(0, 4) : crew;
     var crewChunks = <List<Employee>>[];
@@ -150,10 +149,11 @@ class _DescriptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
+    final overview = context
+        .select((MovieDetailsModel model) => model.movieDetails?.overview);
 
     return Text(
-      model?.movieDetails?.overview ?? '',
+      overview ?? '',
       style: const TextStyle(
         fontSize: 16,
         color: Colors.white,
@@ -186,9 +186,11 @@ class _TopPosterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    final backdropPath = model?.movieDetails?.backdropPath;
-    final posterPath = model?.movieDetails?.posterPath;
+    final model = context.watch<MovieDetailsModel>();
+    final movieDetails =
+        context.select((MovieDetailsModel model) => model.movieDetails);
+    final backdropPath = movieDetails?.backdropPath;
+    final posterPath = movieDetails?.posterPath;
 
     return AspectRatio(
       aspectRatio: 411 / 231,
@@ -209,8 +211,8 @@ class _TopPosterWidget extends StatelessWidget {
             top: 5,
             right: 5,
             child: IconButton(
-              onPressed: () => model?.toggleFavorite(),
-              icon: Icon(model?.isFavorite == true
+              onPressed: () => model.toggleFavorite(context),
+              icon: Icon(model.isFavorite == true
                   ? Icons.favorite
                   : Icons.favorite_border_outlined),
             ),
@@ -226,8 +228,10 @@ class _MovieNamedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    var year = model?.movieDetails?.releaseDate?.year.toString();
+    final model = context.read<MovieDetailsModel>();
+    var year = context.select((MovieDetailsModel model) =>
+        model.movieDetails?.releaseDate?.year.toString());
+
     year = year != null ? ' ($year)' : '';
     return Center(
       child: RichText(
@@ -235,7 +239,7 @@ class _MovieNamedWidget extends StatelessWidget {
         textAlign: TextAlign.center,
         text: TextSpan(children: [
           TextSpan(
-              text: model?.movieDetails?.title ?? '',
+              text: model.movieDetails?.title ?? '',
               style:
                   const TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
           TextSpan(
@@ -255,8 +259,10 @@ class _ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //var
     final movieDetails =
-        NotifierProvider.watch<MovieDetailsModel>(context)?.movieDetails;
+        context.select((MovieDetailsModel model) => model.movieDetails);
+
     var voteAverage = movieDetails?.voteAverage ?? 0;
     voteAverage = voteAverage * 10;
     final videos = movieDetails?.videos.results
@@ -328,18 +334,20 @@ class _SummaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MovieDetailsModel>(context);
-    if (model == null) return const SizedBox.shrink();
+    final model = context.read<MovieDetailsModel>();
+    final movieDetails =
+        context.select((MovieDetailsModel model) => model.movieDetails);
+    // if (model == null) return const SizedBox.shrink();
     var texts = <String>[];
-    final releaseDate = model.movieDetails?.releaseDate;
+    final releaseDate = movieDetails?.releaseDate;
     if (releaseDate != null) {
       texts.add(model.stringFromDate(releaseDate));
     }
-    final productionCountries = model.movieDetails?.productionCountries;
+    final productionCountries = movieDetails?.productionCountries;
     if (productionCountries != null && productionCountries.isNotEmpty) {
       texts.add('(${productionCountries.first.iso})');
     }
-    final genres = model.movieDetails?.genres;
+    final genres = movieDetails?.genres;
     if (genres != null && genres.isNotEmpty) {
       var genersNames = <String>[];
       for (var genr in genres) {
@@ -347,7 +355,7 @@ class _SummaryWidget extends StatelessWidget {
       }
       texts.add(genersNames.join(', '));
     }
-    final runtime = model.movieDetails?.runtime ?? 0;
+    final runtime = movieDetails?.runtime ?? 0;
     // final milliseconds = runtime * 60000;
     // final runtimeDate =
     //     DateTime.fromMillisecondsSinceEpoch(milliseconds).toUtc();

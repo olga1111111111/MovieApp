@@ -9,13 +9,13 @@ part 'popular_movie_response.g.dart';
 class PopularMovieResponse {
   final int page;
   @JsonKey(name: 'results')
-  final List<Movie> movie;
+  final List<Movie> movies;
   final int totalResults;
   final int totalPages;
 
   PopularMovieResponse(
     this.page,
-    this.movie,
+    this.movies,
     this.totalResults,
     this.totalPages,
   );
