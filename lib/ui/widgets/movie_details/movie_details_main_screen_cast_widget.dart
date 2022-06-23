@@ -46,11 +46,11 @@ class _ActorListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var cast = context
-        .select((MovieDetailsModel model) => model.movieDetails?.credits.cast);
-    if (cast == null || cast.isEmpty) return const SizedBox.shrink();
+    var data =
+        context.select((MovieDetailsModel model) => model.data.actorsData);
+    if (data.isEmpty) return const SizedBox.shrink();
     return ListView.builder(
-      itemCount: 100,
+      itemCount: data.length,
       itemExtent: 120,
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, int index) {
@@ -70,7 +70,7 @@ class _ActorListItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.read<MovieDetailsModel>();
-    var actor = model.movieDetails!.credits.cast[actorIndex];
+    var actor = model.data.actorsData[actorIndex];
     final profilePath = actor.profilePath;
     return Padding(
         padding: const EdgeInsets.all(8.0),
@@ -92,14 +92,13 @@ class _ActorListItemWidget extends StatelessWidget {
             clipBehavior: Clip.hardEdge,
             child: Column(
               children: [
-                profilePath != null
-                    ? Image.network(
-                        ImageDownloader.imageUrl(profilePath),
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.fitWidth,
-                      )
-                    : const SizedBox.shrink(),
+                if (profilePath != null)
+                  Image.network(
+                    ImageDownloader.imageUrl(profilePath),
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.fitWidth,
+                  ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),

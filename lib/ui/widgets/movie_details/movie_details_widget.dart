@@ -17,7 +17,9 @@ class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    context.read<MovieDetailsModel>().setupLocale(context);
+//выполнится на следующем витке EventLoop, когда дерево виджетов уже построится
+    Future.microtask(
+        () => context.read<MovieDetailsModel>().setupLocale(context));
   }
 
   @override
@@ -40,9 +42,8 @@ class _TitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title =
-        context.select((MovieDetailsModel model) => model.movieDetails?.title);
-    return Text(title ?? 'Загрузка...');
+    final title = context.select((MovieDetailsModel model) => model.data.title);
+    return Text(title);
   }
 }
 
@@ -51,10 +52,10 @@ class _BodyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final movieDetails =
-        context.select((MovieDetailsModel model) => model.movieDetails);
+    final isLoading =
+        context.select((MovieDetailsModel model) => model.data.isLoading);
 
-    if (movieDetails == null) {
+    if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
     return ListView(
