@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:themoviedb/domain/api_client/image_downloader.dart';
-import 'package:themoviedb/domain/entity/movie_details_credits.dart';
+
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
 import 'package:themoviedb/ui/widgets/elements/radial_persent_widget.dart';
@@ -48,19 +48,12 @@ class _PeopleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var crew = context
-        .select((MovieDetailsModel model) => model.movieDetails?.credits.crew);
-    if (crew == null || crew.isEmpty) return const SizedBox.shrink();
-    crew = crew.length > 4 ? crew.sublist(0, 4) : crew;
-    var crewChunks = <List<Employee>>[];
-    for (var i = 0; i < crew.length; i += 2) {
-      crewChunks.add(
-        crew.sublist(i, i + 2 > crew.length ? crew.length : i + 2),
-      );
-    }
+    var crew =
+        context.select((MovieDetailsModel model) => model.data.peopleData);
+    if (crew.isEmpty) return const SizedBox.shrink();
 
     return Column(
-      children: crewChunks
+      children: crew
           .map((chunk) => Padding(
                 padding: const EdgeInsets.only(bottom: 20),
                 child: _PeopleWidgetRow(employes: chunk),
@@ -78,7 +71,7 @@ class _PeopleWidget extends StatelessWidget {
 }
 
 class _PeopleWidgetRow extends StatelessWidget {
-  final List<Employee> employes;
+  final List<MovieDetailsMoviePeopleData> employes;
   const _PeopleWidgetRow({Key? key, required this.employes}) : super(key: key);
 
   @override
@@ -112,7 +105,7 @@ class _PeopleWidgetRow extends StatelessWidget {
 }
 
 class _PeopleWidgetRowItem extends StatelessWidget {
-  final Employee employee;
+  final MovieDetailsMoviePeopleData employee;
   const _PeopleWidgetRowItem({
     Key? key,
     required this.employee,
@@ -149,11 +142,11 @@ class _DescriptionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final overview = context
-        .select((MovieDetailsModel model) => model.movieDetails?.overview);
+    final overview =
+        context.select((MovieDetailsModel model) => model.data.overview);
 
     return Text(
-      overview ?? '',
+      overview,
       style: const TextStyle(
         fontSize: 16,
         color: Colors.white,
@@ -187,34 +180,31 @@ class _TopPosterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.watch<MovieDetailsModel>();
-    final movieDetails =
-        context.select((MovieDetailsModel model) => model.movieDetails);
-    final backdropPath = movieDetails?.backdropPath;
-    final posterPath = movieDetails?.posterPath;
-
+    final posterData =
+        context.select((MovieDetailsModel model) => model.data.posterData);
+    final backdropPath = posterData.backdropPath;
+    final posterPath = posterData.posterPath;
+//backdropPath
+//posterPath
+// isFavorite -favoriteIcon
     return AspectRatio(
       aspectRatio: 411 / 231,
       child: Stack(
         children: [
-          backdropPath != null
-              ? Image.network(ImageDownloader.imageUrl(backdropPath))
-              : const SizedBox.shrink(),
-          Positioned(
-            top: 20,
-            left: 20,
-            bottom: 20,
-            child: posterPath != null
-                ? Image.network(ImageDownloader.imageUrl(posterPath))
-                : const SizedBox.shrink(),
-          ),
+          if (backdropPath != null)
+            Image.network(ImageDownloader.imageUrl(backdropPath)),
+          if (posterPath != null)
+            Positioned(
+                top: 20,
+                left: 20,
+                bottom: 20,
+                child: Image.network(ImageDownloader.imageUrl(posterPath))),
           Positioned(
             top: 5,
             right: 5,
             child: IconButton(
               onPressed: () => model.toggleFavorite(context),
-              icon: Icon(model.isFavorite == true
-                  ? Icons.favorite
-                  : Icons.favorite_border_outlined),
+              icon: Icon(posterData.favoriteIcon),
             ),
           ),
         ],
@@ -228,22 +218,20 @@ class _MovieNamedWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.read<MovieDetailsModel>();
-    var year = context.select((MovieDetailsModel model) =>
-        model.movieDetails?.releaseDate?.year.toString());
+    final data =
+        context.select((MovieDetailsModel model) => model.data.nameData);
 
-    year = year != null ? ' ($year)' : '';
     return Center(
       child: RichText(
         maxLines: 3,
         textAlign: TextAlign.center,
         text: TextSpan(children: [
           TextSpan(
-              text: model.movieDetails?.title ?? '',
+              text: data.name,
               style:
                   const TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
           TextSpan(
-              text: year,
+              text: data.year,
               style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
@@ -259,15 +247,10 @@ class _ScoreWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //var
-    final movieDetails =
-        context.select((MovieDetailsModel model) => model.movieDetails);
+    final scoreData =
+        context.select((MovieDetailsModel model) => model.data.scoreData);
 
-    var voteAverage = movieDetails?.voteAverage ?? 0;
-    voteAverage = voteAverage * 10;
-    final videos = movieDetails?.videos.results
-        .where((video) => video.type == 'Trailer' && video.site == 'YouTube');
-    final trailerKey = videos?.isNotEmpty == true ? videos?.first.key : null;
+    final trailerKey = scoreData.trailerKey;
 
     return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       Row(
@@ -279,10 +262,10 @@ class _ScoreWidget extends StatelessWidget {
               fillColor: const Color.fromARGB(255, 10, 23, 25),
               freeColor: const Color.fromARGB(255, 25, 54, 31),
               lineColor: const Color.fromARGB(255, 37, 203, 103),
-              percent: voteAverage / 100,
+              percent: scoreData.voteAverage / 100,
               lineWidth: 3,
               child: Text(
-                voteAverage.toStringAsFixed(0),
+                scoreData.voteAverage.toStringAsFixed(0),
                 style: const TextStyle(color: Colors.white, fontSize: 15),
               ),
             ),
@@ -295,22 +278,21 @@ class _ScoreWidget extends StatelessWidget {
         height: 15,
         color: Colors.grey,
       ),
-      trailerKey != null
-          ? TextButton(
-              onPressed: () => Navigator.of(context).pushNamed(
-                  MainNavigationRouteNames.movieTrailerWidget,
-                  arguments: trailerKey),
-              child: Row(
-                children: const [
-                  Icon(
-                    Icons.play_arrow,
-                    // color: Colors.grey,
-                  ),
-                  Text('Play Trailer'),
-                ],
+      if (trailerKey != null)
+        TextButton(
+          onPressed: () => Navigator.of(context).pushNamed(
+              MainNavigationRouteNames.movieTrailerWidget,
+              arguments: trailerKey),
+          child: Row(
+            children: const [
+              Icon(
+                Icons.play_arrow,
+                // color: Colors.grey,
               ),
-            )
-          : const SizedBox.shrink(),
+              Text('Play Trailer'),
+            ],
+          ),
+        )
     ]);
 
     //     trailerKey != null
@@ -334,43 +316,15 @@ class _SummaryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.read<MovieDetailsModel>();
-    final movieDetails =
-        context.select((MovieDetailsModel model) => model.movieDetails);
-    // if (model == null) return const SizedBox.shrink();
-    var texts = <String>[];
-    final releaseDate = movieDetails?.releaseDate;
-    if (releaseDate != null) {
-      texts.add(model.stringFromDate(releaseDate));
-    }
-    final productionCountries = movieDetails?.productionCountries;
-    if (productionCountries != null && productionCountries.isNotEmpty) {
-      texts.add('(${productionCountries.first.iso})');
-    }
-    final genres = movieDetails?.genres;
-    if (genres != null && genres.isNotEmpty) {
-      var genersNames = <String>[];
-      for (var genr in genres) {
-        genersNames.add(genr.name);
-      }
-      texts.add(genersNames.join(', '));
-    }
-    final runtime = movieDetails?.runtime ?? 0;
-    // final milliseconds = runtime * 60000;
-    // final runtimeDate =
-    //     DateTime.fromMillisecondsSinceEpoch(milliseconds).toUtc();
-    // texts.add(DateFormat.Hm().format(runtimeDate));
-    final duration = Duration(minutes: runtime);
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes.remainder(60);
-    texts.add('${hours}h  ${minutes}m');
+    final summary =
+        context.select((MovieDetailsModel model) => model.data.summary);
 
     return ColoredBox(
       color: const Color.fromRGBO(22, 21, 25, 1.0),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Text(
-          texts.join(' '),
+          summary,
           // ' R (US 04/29/2021 ) боевик, триллер, военный 1 h 49m',
           maxLines: 3,
           textAlign: TextAlign.center,
