@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:themoviedb/domain/api_client/movie_api_client.dart';
-import 'package:themoviedb/domain/data_providers/session_data_provider.dart';
 import 'package:themoviedb/domain/entity/movie_details.dart';
 import 'package:themoviedb/domain/services/auth_service.dart';
+import 'package:themoviedb/domain/services/movies_service.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
 import '../../../domain/api_client/account_api_client.dart';
@@ -91,10 +90,8 @@ class MovieDetailsData {
 }
 
 class MovieDetailsModel extends ChangeNotifier {
-  final authService = AuthService();
-  final _sessionDataProvider = SessionDataProvider();
-  final _accountApiClient = AccountApiClient();
-  final _movieApiClient = MovieApiClient();
+  final _authService = AuthService();
+  final _movieService = MoviesService();
 
   final int movieId;
   final data = MovieDetailsData();
@@ -117,14 +114,10 @@ class MovieDetailsModel extends ChangeNotifier {
 
   Future<void> loadDetails(BuildContext context) async {
     try {
-      final movieDetails = await _movieApiClient.movieDetails(_locale, movieId);
-      final sessionId = await _sessionDataProvider.getSessionId();
-      var isFavorite = false;
-      if (sessionId != null) {
-        isFavorite = await _movieApiClient.isFavorite(sessionId, movieId);
-      }
+      final details =
+          await _movieService.loadDetails(locale: _locale, movieId: movieId);
 
-      updateData(movieDetails, isFavorite);
+      updateData(details.details, details.isFavorite);
     } on ApiClientException catch (e) {
       _handleApiClientExeption(e, context);
     }
@@ -206,27 +199,17 @@ class MovieDetailsModel extends ChangeNotifier {
   }
 
   Future<void> toggleFavorite(BuildContext context) async {
-    final accountId = await _sessionDataProvider.getAccountId();
-    final sessionId = await _sessionDataProvider.getSessionId();
-
-    if (sessionId == null || accountId == null) return;
-
+//переключение состояния
     data.posterData =
         data.posterData.copyWith(isFavorite: !data.posterData.isFavorite);
     notifyListeners();
     try {
-      await _accountApiClient.markAsFavorite(
-        accountId: accountId,
-        sessionId: sessionId,
-        mediaType: MediaType.movie,
-        mediaId: movieId,
-        isFavorite: data.posterData.isFavorite,
-      );
+      await _movieService.upDateFavorite(
+          movieId: movieId, isFavorite: data.posterData.isFavorite);
     } on ApiClientException catch (_) {
       // выбивает из приложения при нажатии на избранное status code 3:
       // _handleApiClientExeption(e);
-      //   _handleApiClientExeption(e, context);
-
+      // _handleApiClientExeption(e, context);
     }
   }
 
@@ -235,7 +218,7 @@ class MovieDetailsModel extends ChangeNotifier {
     switch (exception.type) {
       case ApiClientExceptionType.sessionExpired:
         // onSessionExpired?.call();
-        authService.logout();
+        _authService.logout();
         MainNavigation.resetNavigation(context);
 
         break;
