@@ -6,7 +6,6 @@ import 'package:themoviedb/domain/services/auth_service.dart';
 import 'package:themoviedb/domain/services/movies_service.dart';
 import 'package:themoviedb/ui/navigation/main_navigation.dart';
 
-import '../../../domain/api_client/account_api_client.dart';
 import '../../../domain/api_client/api_client_exception.dart';
 
 class MovieDetailsPosterData {
@@ -103,11 +102,12 @@ class MovieDetailsModel extends ChangeNotifier {
 
   MovieDetailsModel(this.movieId);
 
-  Future<void> setupLocale(BuildContext context) async {
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    if (_locale == locale) return;
-    _locale = locale;
-    _dateFormat = DateFormat.yMMMMd(locale);
+  Future<void> setupLocale(BuildContext context, Locale locale) async {
+    final localeTag = locale.toLanguageTag();
+    if (_locale == localeTag) return;
+    _locale = localeTag;
+    _dateFormat = DateFormat.yMMMMd(localeTag);
+    //если локаль обновится почистить  все данные и загрузить новые
     updateData(null, false);
     await loadDetails(context);
   }
