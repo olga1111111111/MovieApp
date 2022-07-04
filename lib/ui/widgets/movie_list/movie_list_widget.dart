@@ -16,8 +16,9 @@ class _MovieListWidgetState extends State<MovieListWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final locale = Localizations.localeOf(context);
     // получаю модель без подписки, внутри делаю подписку в локали:
-    context.read<MovieListViewModel>().setupLocale(context);
+    context.read<MovieListViewModel>().setupLocale(locale);
   }
 
   @override

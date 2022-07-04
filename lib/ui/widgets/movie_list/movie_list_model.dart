@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:themoviedb/Labrary/Widgets/inherited/localized_model.dart';
 import 'package:themoviedb/Labrary/Widgets/inherited/paginator.dart';
 
 import 'package:themoviedb/domain/entity/movie.dart';
@@ -32,7 +33,7 @@ class MovieListViewModel extends ChangeNotifier {
   late final Paginator<Movie> _searchMoviePaginator;
   // запрос с задержкой таймера для отмены побуквенного запроса:
   Timer? searchDebounce;
-  String _locale = '';
+  final _localeStorage = LocalizedModelStorage();
   var _movies = <MovieListRowData>[];
   String? _searchQuery;
   bool get isSearchMode {
@@ -45,15 +46,16 @@ class MovieListViewModel extends ChangeNotifier {
   late DateFormat _dateFormat;
   MovieListViewModel() {
     _popularMoviePaginator = Paginator<Movie>((page) async {
-      final result = await _movieService.popularMovie(page, _locale);
+      final result =
+          await _movieService.popularMovie(page, _localeStorage.localeTag);
       return PaginatorLoadResult(
           data: result.movies,
           currentPage: result.page,
           totalPage: result.totalPages);
     });
     _searchMoviePaginator = Paginator<Movie>((page) async {
-      final result =
-          await _movieService.searchMovie(page, _locale, _searchQuery ?? '');
+      final result = await _movieService.searchMovie(
+          page, _localeStorage.localeTag, _searchQuery ?? '');
       return PaginatorLoadResult(
           data: result.movies,
           currentPage: result.page,
@@ -61,11 +63,10 @@ class MovieListViewModel extends ChangeNotifier {
     });
   }
 
-  Future<void> setupLocale(BuildContext context) async {
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    if (_locale == locale) return;
-    _locale = locale;
-    _dateFormat = DateFormat.yMMMd(locale);
+  Future<void> setupLocale(Locale locale) async {
+    if (!_localeStorage.upDateLocale(locale)) return;
+
+    _dateFormat = DateFormat.yMMMd(_localeStorage.localeTag);
     await _resetList();
   }
 
