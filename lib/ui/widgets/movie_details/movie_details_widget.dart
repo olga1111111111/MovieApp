@@ -17,9 +17,11 @@ class _MovieDetailsWidgetState extends State<MovieDetailsWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-//выполнится на следующем витке EventLoop, когда дерево виджетов уже построится
+    //явная подписка на локаль
+    final locale = Localizations.localeOf(context);
+//выполнится на следующем витке EventLoop, когда дерево виджетов уже построится:
     Future.microtask(
-        () => context.read<MovieDetailsModel>().setupLocale(context));
+        () => context.read<MovieDetailsModel>().setupLocale(context, locale));
   }
 
   @override
